@@ -82,7 +82,6 @@ use rustc_span::symbol::{kw, Ident, Symbol};
 use rustc_span::{BytePos, Pos, Span, SyntaxContext, DUMMY_SP};
 use rustc_target::abi::Integer;
 use rustc_trait_selection::traits::query::normalize::AtExt;
-use smallvec::SmallVec;
 
 use crate::consts::{constant, Constant};
 use std::collections::HashMap;
@@ -1665,11 +1664,9 @@ pub fn match_panic_def_id(cx: &LateContext<'_>, did: DefId) -> bool {
 /// sequence of `if/else`.
 /// E.g., this returns `([a, b], [c, d, e])` for the expression
 /// `if a { c } else if b { d } else { e }`.
-pub fn if_sequence<'tcx>(
-    mut expr: &'tcx Expr<'tcx>,
-) -> (SmallVec<[&'tcx Expr<'tcx>; 1]>, SmallVec<[&'tcx Block<'tcx>; 1]>) {
-    let mut conds = SmallVec::new();
-    let mut blocks: SmallVec<[&Block<'_>; 1]> = SmallVec::new();
+pub fn if_sequence<'tcx>(mut expr: &'tcx Expr<'tcx>) -> (Vec<&'tcx Expr<'tcx>>, Vec<&'tcx Block<'tcx>>) {
+    let mut conds = Vec::new();
+    let mut blocks: Vec<&Block<'_>> = Vec::new();
 
     while let ExprKind::If(ref cond, ref then_expr, ref else_expr) = expr.kind {
         conds.push(&**cond);
